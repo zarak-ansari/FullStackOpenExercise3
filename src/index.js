@@ -11,7 +11,7 @@ app.use(express.json())
 // app.use(morgan('tiny'))
 app.use(morgan(':method :url :status :response-time ms - :res[content-length] :body'))
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 
 let persons = [
     {
