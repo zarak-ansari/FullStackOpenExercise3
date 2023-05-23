@@ -1,18 +1,18 @@
 require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
-const { token } = require('morgan');
+const { token } = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
 
 token('body', (req) => {
-    return JSON.stringify(req.body);
+    return JSON.stringify(req.body)
 })
 
 const app = express()
 
-app.use(express.static('build'))
 app.use(cors())
+app.use(express.static('build'))
 app.use(express.json())
 app.use(morgan(':method :url :status :response-time ms - :res[content-length] :body'))
 
@@ -21,27 +21,27 @@ const PORT = process.env.PORT
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
     if(error.name === 'CastError'){
-        response.status(400).send({error:"malformatted id"})
+        response.status(400).send({error:'malformatted id'})
     } else if (error.name === 'ValidationError') {
         response.status(400).send({ error: error.message })  
     }
     next(error)
 }
 
-app.get("/info", (request, response) => {
+app.get('/info', (request, response) => {
     const currDate = new Date()
     Person.find({}).then(persons => {
         response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${currDate.toUTCString()}</p>`)
     })
 })
 
-app.get("/persons", (request, response, next) => {
+app.get('/persons', (request, response, next) => {
     Person.find({})
         .then(persons => response.json(persons))
         .catch(error => next(error))
 })
 
-app.get("/persons/:id", (request, response, next) => {
+app.get('/persons/:id', (request, response, next) => {
     Person
         .findById(request.params.id)
         .then(person => {
@@ -54,11 +54,11 @@ app.get("/persons/:id", (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.post("/persons", (request, response, next) => {
+app.post('/persons', (request, response, next) => {
     const personSent = request.body
 
     if (!personSent.name || !personSent.number) {
-        return response.status(400).json({ "error": "name and number must be in request" })
+        return response.status(400).json({ 'error': 'name and number must be in request' })
     }
 
     const person = new Person(request.body)
@@ -67,14 +67,14 @@ app.post("/persons", (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.delete("/persons/:id", (request, response, next) => {
+app.delete('/persons/:id', (request, response, next) => {
     Person
         .findByIdAndRemove(request.params.id)
         .then(response.status(200).end())
         .catch(error => next(error))
 })
 
-app.put("/persons/:id", (request, response, next) => {
+app.put('/persons/:id', (request, response, next) => {
     const newPerson = {
         name: request.body.name,
         number: request.body.number
